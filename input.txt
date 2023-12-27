@@ -1,0 +1,11 @@
+create_ast "room";
+"room".status();
+"room".set_temperature(23);
+"room".light_on();
+if ("room".temperature == 23) { 
+    "room".light_off();
+    "room".set_temperature(20);
+} else {
+    "room".light_off();
+}
+"room".status();
