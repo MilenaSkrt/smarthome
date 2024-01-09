@@ -57,6 +57,14 @@ extern Block if_block;
 extern Block else_block;
 extern bool in_false_if_block;
 
+void add_int_variable(const char* name, int value);
+void add_string_variable(const char* name, const char* value);
+void set_int_variable(const char* name, int value);
+void set_string_variable(const char* name, const char* value);
+Variable* get_variable(const char* name);
+void print_variable(Variable* var);
+void print_expression_result(int result);
+
 void add_cmd(CommandFunction func, AST* obj);
 void execute_commands();
 void clear_commands();

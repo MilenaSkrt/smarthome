@@ -14,6 +14,36 @@ struct AST;
 AST* root = NULL;
 CommandList* current_command_list = NULL;
 void yyerror(const char* s);
+
+// Symbol Table
+typedef struct {
+    char* name;
+    int type; // 0 for int, 1 for string
+    int intValue;
+    char* stringValue;
+} Symbol;
+
+Symbol symbolTable[100];
+int symbolCount = 0;
+
+void addSymbol(char* name, int type, int intValue, char* stringValue) {
+    Symbol symbol;
+    symbol.name = name;
+    symbol.type = type;
+    symbol.intValue = intValue;
+    symbol.stringValue = stringValue;
+    symbolTable[symbolCount++] = symbol;
+}
+
+Symbol* findSymbol(char* name) {
+    for (int i = 0; i < symbolCount; i++) {
+        if (strcmp(symbolTable[i].name, name) == 0) {
+            return &symbolTable[i];
+        }
+    }
+    return NULL;
+}
+
 %}
 
 %lex-param { YYSTYPE yylval; }
@@ -56,7 +86,35 @@ statement: create_ast_statement SEMICOLON
          | set_temperature_statement SEMICOLON    
          | print_statement SEMICOLON 
          | if_else_statement 
+         | variable_declaration SEMICOLON
+         | assignment_statement SEMICOLON
          ;
+
+assignment_statement: 
+    ID EQUAL expression { 
+        Symbol* symbol = findSymbol($1);
+        if (symbol != NULL) {
+            if (symbol->type == 0) {
+                symbol->intValue = $3;
+            } else {
+                fprintf(stderr, "Error: Cannot assign integer value to string variable '%s'\n", $1);
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            fprintf(stderr, "Error: Variable '%s' not found\n", $1);
+            exit(EXIT_FAILURE);
+        }
+    }
+    ;
+
+variable_declaration:
+    INT_TYPE ID EQUAL INTEGER {
+        addSymbol($2, 0, $4, NULL);
+    }
+  | STRING_TYPE ID EQUAL STRING_VALUE {
+        addSymbol($2, 1, 0, $4);
+    }
+  ;
 
 create_ast_statement: CREATE_AST STRING { $$ = create_ast($2); root = $$; }
 ;

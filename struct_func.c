@@ -32,6 +32,77 @@ AST* getast(const char* name) {
     return NULL;
 }
 
+// Это перменные 
+
+// Функции для работы с переменными
+void add_int_variable(const char* name, int value) {
+    if (variableCount >= MAX_VARIABLES) {
+        fprintf(stderr, "Превышено максимальное количество переменных\n");
+        return;
+    }
+    Variable* var = &variables[variableCount++];
+    strncpy(var->name, name, sizeof(var->name) - 1);
+    var->type = INT;
+    var->int_value = value;
+}
+
+void add_string_variable(const char* name, const char* value) {
+    if (variableCount >= MAX_VARIABLES) {
+        fprintf(stderr, "Превышено максимальное количество переменных\n");
+        return;
+    }
+    Variable* var = &variables[variableCount++];
+    strncpy(var->name, name, sizeof(var->name) - 1);
+    var->type = VAR_STRING_TYPE;
+    var->str_value = strdup(value); 
+}
+
+void print_variable(Variable* var) {
+    if (var->type == INT) {
+        printf("%d\n", var->int_value);
+    } else if (var->type == VAR_STRING_TYPE) {
+        printf("%s\n", var->str_value);
+    }
+}
+
+
+void print_expression_result(int result) {
+    printf("%d\n", result);
+}
+
+
+
+void set_int_variable(const char* name, int value) {
+    for (int i = 0; i < variableCount; ++i) {
+        if (strcmp(variables[i].name, name) == 0 && variables[i].type == INT) {
+            variables[i].int_value = value;
+            return;
+        }
+    }
+    fprintf(stderr, "Int variable '%s' not found\n", name);
+}
+
+void set_string_variable(const char* name, const char* value) {
+    for (int i = 0; i < variableCount; ++i) {
+        if (strcmp(variables[i].name, name) == 0 && variables[i].type == VAR_STRING_TYPE) {
+            free(variables[i].str_value); 
+            variables[i].str_value = strdup(value);
+            return;
+        }
+    }
+    fprintf(stderr, "String variable '%s' not found\n", name);
+}
+
+Variable* get_variable(const char* name) {
+    for (int i = 0; i < variableCount; ++i) {
+        if (strcmp(variables[i].name, name) == 0) {
+            return &variables[i];
+        }
+    }
+    return NULL;
+}
+
+
 void add_cmd_list(void (*execute)(AST*, int), AST* obj, int arg) {
     if (!in_false_if_block) {
         if (commandCount >= MAX_COMMANDS) {

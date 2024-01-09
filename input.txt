@@ -9,3 +9,5 @@ if ("room".temperature == 23) {
     "room".light_off();
 }
 "room".status();
+int A == 3;
+print(A * 5);
